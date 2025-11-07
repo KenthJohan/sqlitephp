@@ -20,11 +20,12 @@ if (empty($tableName)) {
     exit;
 }
 
-// Parse filters from URL parameters
+// Parse filters from URL parameters (prefixed with "f_")
 $filters = [];
 foreach ($_GET as $key => $value) {
-    if ($key !== 'table' && !empty($value)) {
-        $filters[$key] = $value;
+    if (str_starts_with($key, 'f_') && !empty($value)) {
+        $columnName = substr($key, 2); // Remove "f_" prefix
+        $filters[$columnName] = $value;
     }
 }
 

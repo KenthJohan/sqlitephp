@@ -43,11 +43,12 @@ class SQLiteViewer {
                 this.currentTable = table;
                 this.tableInput.value = table;
                 
-                // Parse filters
+                // Parse filters (prefixed with "f_")
                 this.currentFilters = {};
                 for (const [key, value] of params) {
-                    if (key !== 'table') {
-                        this.currentFilters[key] = value;
+                    if (key.startsWith('f_')) {
+                        const columnName = key.substring(2); // Remove "f_" prefix
+                        this.currentFilters[columnName] = value;
                     }
                 }
                 
@@ -64,7 +65,7 @@ class SQLiteViewer {
         
         for (const [key, value] of Object.entries(this.currentFilters)) {
             if (value) {
-                params.set(key, value);
+                params.set('f_' + key, value); // Add "f_" prefix
             }
         }
         
@@ -91,9 +92,15 @@ class SQLiteViewer {
         
         try {
             const params = new URLSearchParams({
-                table: this.currentTable,
-                ...this.currentFilters
+                table: this.currentTable
             });
+            
+            // Add filters with "f_" prefix
+            for (const [key, value] of Object.entries(this.currentFilters)) {
+                if (value) {
+                    params.set('f_' + key, value);
+                }
+            }
             
             const response = await fetch(`query.php?${params}`);
             if (!response.ok) {
