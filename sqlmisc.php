@@ -13,7 +13,7 @@ function getTableSchema($pdo, $tableName)
 }
 
 // Function to get table data
-function getTableData($pdo, $tableName, $limit = 100, $filters = [])
+function generateSQL($pdo, $tableName, $limit = 100, $filters = [])
 {
     // Validate table name to prevent SQL injection
     if (!preg_match('/^[a-zA-Z_][a-zA-Z0-9_]*$/', $tableName)) {
@@ -42,9 +42,10 @@ function getTableData($pdo, $tableName, $limit = 100, $filters = [])
     $sql .= " LIMIT ?";
     $params[] = $limit;
     
-    $stmt = $pdo->prepare($sql);
-    $stmt->execute($params);
-    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    return [
+        'sql' => $sql,
+        'params' => $params
+    ];
 }
 
 // Function to count rows in table
