@@ -115,10 +115,21 @@ h2 {
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+#data-table td:hover {
+    background-color: #e3f2fd;
+    position: relative;
+}
+
+#data-table td:active {
+    background-color: #bbdefb;
 }
 
 #data-table tr:hover {
-    background-color: #f8f9fa;
+    background-color: transparent; /* Override the row hover when we have cell hover */
 }
 
 .column-header {
@@ -131,6 +142,17 @@ h2 {
     font-weight: bold;
     color: #333;
     font-size: 14px;
+}
+
+.column-type {
+    font-size: 11px;
+    color: #666;
+    font-style: italic;
+    text-transform: uppercase;
+    background-color: #e9ecef;
+    padding: 2px 6px;
+    border-radius: 3px;
+    text-align: center;
 }
 
 .filter-input {
@@ -146,6 +168,99 @@ h2 {
     outline: none;
     border-color: #007bff;
     box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+}
+
+.modify-row {
+    background-color: #fff3cd !important;
+    border-top: 2px solid #ffc107 !important;
+}
+
+.modify-header {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.modify-header small {
+    font-weight: bold;
+    color: #856404;
+    font-size: 11px;
+}
+
+.update-input {
+    padding: 4px 6px;
+    border: 1px solid #ffc107;
+    border-radius: 3px;
+    font-size: 12px;
+    width: 100%;
+    box-sizing: border-box;
+    background-color: #fff;
+}
+
+.update-input:focus {
+    outline: none;
+    border-color: #ff8c00;
+    box-shadow: 0 0 0 2px rgba(255, 193, 7, 0.25);
+}
+
+.update-btn {
+    padding: 8px 16px;
+    background-color: #28a745;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: bold;
+    width: 100%;
+    transition: background-color 0.2s ease;
+    white-space: nowrap;
+}
+
+.update-btn:hover {
+    background-color: #218838;
+}
+
+.update-btn:active {
+    background-color: #1e7e34;
+}
+
+/* Number input styling for update inputs */
+.update-input[type="number"]::-webkit-outer-spin-button,
+.update-input[type="number"]::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+.update-input[type="number"] {
+    -moz-appearance: textfield;
+    appearance: textfield;
+}
+
+.update-input[type="date"],
+.update-input[type="datetime-local"] {
+    font-family: inherit;
+    min-width: 120px;
+}
+
+/* Ensure number inputs don't show spinners on webkit browsers */
+.filter-input[type="number"]::-webkit-outer-spin-button,
+.filter-input[type="number"]::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+/* Firefox number input styling */
+.filter-input[type="number"] {
+    -moz-appearance: textfield;
+    appearance: textfield;
+}
+
+/* Date and datetime inputs styling */
+.filter-input[type="date"],
+.filter-input[type="datetime-local"] {
+    font-family: inherit;
+    min-width: 120px;
 }
 
 .error {
