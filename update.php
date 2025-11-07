@@ -31,6 +31,13 @@ if (empty($tableName)) {
     exit;
 }
 
+// Prevent updates to SQLite system tables
+if (strtolower($tableName) === 'sqlite_master' || strtolower($tableName) === 'sqlite_sequence') {
+    http_response_code(403);
+    echo json_encode(['error' => 'Updates to SQLite system tables are not allowed']);
+    exit;
+}
+
 if (empty($updates)) {
     http_response_code(400);
     echo json_encode(['error' => 'No updates specified']);
