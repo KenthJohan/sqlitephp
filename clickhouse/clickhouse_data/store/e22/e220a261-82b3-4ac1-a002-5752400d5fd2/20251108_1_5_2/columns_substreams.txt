@@ -1,0 +1,16 @@
+columns substreams version: 1
+7 columns:
+1 substreams for column `event_date`:
+	event_date
+1 substreams for column `event_time`:
+	event_time
+1 substreams for column `site_id`:
+	site_id
+1 substreams for column `site_key`:
+	site_key
+1 substreams for column `views`:
+	views
+1 substreams for column `v_00`:
+	v_00
+1 substreams for column `v_55`:
+	v_55

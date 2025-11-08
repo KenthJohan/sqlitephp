@@ -1,0 +1,16 @@
+<clickhouse>
+    <logger>
+        <level>information</level>
+        <console>true</console>
+    </logger>
+
+    <path>./clickhouse_data/</path>
+    <tmp_path>./clickhouse_data/tmp/</tmp_path>
+    <user_files_path>./clickhouse_data/user_files/</user_files_path>
+
+    <listen_host>127.0.0.1</listen_host>
+    <http_port>8123</http_port>
+    <tcp_port>9000</tcp_port>
+
+    <users_config>./users.xml</users_config>
+</clickhouse>

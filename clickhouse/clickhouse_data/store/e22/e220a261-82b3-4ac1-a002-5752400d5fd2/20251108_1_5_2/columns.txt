@@ -1,0 +1,9 @@
+columns format version: 1
+7 columns:
+`event_date` Date
+`event_time` DateTime
+`site_id` Int32
+`site_key` String
+`views` Int32
+`v_00` Int32
+`v_55` Int32
