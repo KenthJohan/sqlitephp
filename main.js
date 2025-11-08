@@ -181,8 +181,8 @@ class SQLiteViewer {
             
             th.innerHTML = `
                 <div class="column-header">
-                    <span class="column-name">${column.name}</span>
                     <span class="column-type">${column.type || 'Unknown'}</span>
+                    <span class="column-name">${column.name}</span>
                     <input ${inputAttributes}
                            class="filter-input" 
                            data-column="${column.name}"
