@@ -31,13 +31,16 @@ class SVDParser {
         }
         
         $peripherals = [];
+        $peripheralMap = []; // Store peripherals by name for derivedFrom lookup
         
         // Navigate to peripherals section
         if (isset($xml->peripherals->peripheral)) {
             foreach ($xml->peripherals->peripheral as $peripheral) {
-                $peripheralData = $this->extractPeripheralData($peripheral);
+                $peripheralData = $this->extractPeripheralData($peripheral, $peripheralMap);
                 if ($peripheralData) {
                     $peripherals[] = $peripheralData;
+                    // Store in map for future derivedFrom lookups
+                    $peripheralMap[$peripheralData['name']] = $peripheralData;
                 }
             }
         }
@@ -48,13 +51,31 @@ class SVDParser {
     /**
      * Extract data from a single peripheral element
      * @param SimpleXMLElement $peripheral
+     * @param array $peripheralMap Map of already processed peripherals for derivedFrom lookup
      * @return array|null Peripheral data or null if required fields are missing
      */
-    private function extractPeripheralData($peripheral) {
-        // Extract basic peripheral information
+    private function extractPeripheralData($peripheral, $peripheralMap = []) {
+        // Check if this peripheral is derived from another
+        $derivedFrom = null;
+        if (isset($peripheral['derivedFrom'])) {
+            $derivedFrom = (string) $peripheral['derivedFrom'];
+        }
+        
+        // Start with base data (either from derivedFrom peripheral or empty)
+        $baseData = [];
+        if ($derivedFrom && isset($peripheralMap[$derivedFrom])) {
+            $baseData = $peripheralMap[$derivedFrom];
+        }
+        
+        // Extract basic peripheral information (override base data if present)
         $name = (string) $peripheral->name;
         $description = (string) $peripheral->description;
-        $baseAddress = (string) $peripheral->baseAddress;
+        $address = (string) $peripheral->baseAddress;
+        
+        // Use base description if current one is empty
+        if (empty($description) && !empty($baseData['description'])) {
+            $description = $baseData['description'];
+        }
         
         // Extract offset and size from addressBlock
         $offset = null;
@@ -63,20 +84,31 @@ class SVDParser {
         if (isset($peripheral->addressBlock)) {
             $offset = (string) $peripheral->addressBlock->offset;
             $size = (string) $peripheral->addressBlock->size;
+        } else if (!empty($baseData)) {
+            // Use base peripheral's addressBlock data if not defined
+            $offset = $baseData['offset'];
+            $size = $baseData['size'];
         }
         
         // Skip if essential data is missing
-        if (empty($name) || empty($baseAddress)) {
+        if (empty($name) || empty($address)) {
             return null;
         }
         
-        return [
+        $result = [
             'name' => $name,
             'description' => $description ?: 'No description available',
-            'baseAddress' => $this->hexToInt($baseAddress),
-            'offset' => $this->hexToInt($offset ?: '0x0'),
-            'size' => $this->hexToInt($size ?: '0x0')
+            'address' => $address,
+            'offset' => $offset,
+            'size' => $size
         ];
+        
+        // Add derivedFrom information for reference
+        if ($derivedFrom) {
+            $result['derivedFrom'] = $derivedFrom;
+        }
+        
+        return $result;
     }
     
     /**
@@ -103,8 +135,9 @@ class SVDParser {
         // Add table creation statement
         $sql .= $this->generateCreateTableSQL($tableName) . "\n\n";
         
-        foreach ($peripherals as $peripheral) {
-            $sql .= $this->generateSingleInsert($peripheral, $tableName) . "\n";
+        // Generate single INSERT statement with multiple VALUES
+        if (!empty($peripherals)) {
+            $sql .= $this->generateBatchInsert($peripherals, $tableName) . "\n";
         }
         
         return $sql;
@@ -124,6 +157,7 @@ class SVDParser {
                "  `baseAddress` INTEGER NOT NULL,\n" .
                "  `offset` INTEGER,\n" .
                "  `size` INTEGER,\n" .
+               "  `derivedFrom` TEXT,\n" .
                "  `created_at` DATETIME DEFAULT CURRENT_TIMESTAMP\n" .
                ");";
     }
@@ -138,12 +172,40 @@ class SVDParser {
         // Escape single quotes in the data
         $name = $this->escapeSQLString($peripheral['name']);
         $description = $this->escapeSQLString($peripheral['description']);
-        $baseAddress = $peripheral['baseAddress']; // Now an integer
+        $address = $peripheral['address']; // Now an integer
         $offset = $peripheral['offset'];           // Now an integer
         $size = $peripheral['size'];               // Now an integer
+        $derivedFrom = isset($peripheral['derivedFrom']) ? "'" . $this->escapeSQLString($peripheral['derivedFrom']) . "'" : 'NULL';
         
-        return "INSERT INTO `{$tableName}` (`name`, `description`, `baseAddress`, `offset`, `size`) " .
-               "VALUES ('{$name}', '{$description}', {$baseAddress}, {$offset}, {$size});";
+        return "INSERT INTO `{$tableName}` (`name`, `description`, `address`, `offset`, `size`, `derivedFrom`) " .
+               "VALUES ('{$name}', '{$description}', {$address}, {$offset}, {$size}, {$derivedFrom});";
+    }
+    
+    /**
+     * Generate a single INSERT statement with multiple VALUES clauses
+     * @param array $peripherals
+     * @param string $tableName
+     * @return string
+     */
+    private function generateBatchInsert($peripherals, $tableName) {
+        $sql = "INSERT INTO `{$tableName}` (`name`, `description`, `address`, `offset`, `size`) VALUES\n";
+        
+        $values = [];
+        foreach ($peripherals as $peripheral) {
+            // Escape single quotes in the data
+            $name = $this->escapeSQLString($peripheral['name']);
+            $description = $this->escapeSQLString($peripheral['description']);
+            $address = $peripheral['address'];
+            $offset = $peripheral['offset'];
+            $size = $peripheral['size'];
+            $derivedFrom = isset($peripheral['derivedFrom']) ? "'" . $this->escapeSQLString($peripheral['derivedFrom']) . "'" : 'NULL';
+            
+            $values[] = "  ('{$name}', '{$description}', {$address}, {$offset}, {$size})";
+        }
+        
+        $sql .= implode(",\n", $values) . ";";
+        
+        return $sql;
     }
     
     /**
@@ -161,27 +223,31 @@ class SVDParser {
      */
     public function printPeripheralTable($peripherals) {
         echo "Found " . count($peripherals) . " peripherals:\n";
-        echo str_repeat("-", 120) . "\n";
-        printf("%-15s %-50s %-15s %-10s %-10s\n", "Name", "Description", "Base Address", "Offset", "Size");
-        echo str_repeat("-", 120) . "\n";
+        echo str_repeat("-", 140) . "\n";
+        printf("%-15s %-50s %-15s %-10s %-10s %-15s\n", "Name", "Description", "Base Address", "Offset", "Size", "Derived From");
+        echo str_repeat("-", 140) . "\n";
         
         foreach ($peripherals as $peripheral) {
-            printf("%-15s %-50s %-15s %-10s %-10s\n", 
+            $derivedFrom = isset($peripheral['derivedFrom']) ? $peripheral['derivedFrom'] : '';
+            printf("%-15s %-50s %-15s %-10s %-10s %-15s\n", 
                    substr($peripheral['name'], 0, 14),
                    substr($peripheral['description'], 0, 49),
-                   sprintf("0x%08X", $peripheral['baseAddress']), // Format as hex for display
-                   sprintf("0x%X", $peripheral['offset']),
-                   sprintf("0x%X", $peripheral['size'])
+                   sprintf("0x%08X", hexdec($peripheral['address'])), // Format as hex for display
+                   sprintf("0x%X", hexdec($peripheral['offset'])),
+                   sprintf("0x%X", hexdec($peripheral['size'])),
+                   substr($derivedFrom, 0, 14)
             );
         }
-        echo str_repeat("-", 120) . "\n";
+        echo str_repeat("-", 140) . "\n";
     }
 }
 
+header('Content-Type: text/plain');
+
 // Main execution
 try {
-    $svdFile = __DIR__ . '/svd/STM32C051.svd';
-    
+    $svdFile = __DIR__ . '/../svd/STM32C051.svd';
+
     echo "SVD File Parser\n";
     echo "===============\n";
     echo "Parsing file: {$svdFile}\n\n";
