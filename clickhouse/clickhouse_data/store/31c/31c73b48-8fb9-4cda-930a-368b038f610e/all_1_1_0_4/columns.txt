@@ -1,7 +1,0 @@
-columns format version: 1
-5 columns:
-`name` String
-`description` String
-`address` UInt32
-`offset` UInt32
-`size` UInt32
