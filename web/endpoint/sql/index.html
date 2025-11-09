@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SQL run queries</title>
+    
+    <!-- CodeMirror CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/theme/default.min.css">
+    
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+        .query-section {
+            margin-bottom: 20px;
+        }
+        .CodeMirror {
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            height: 200px;
+            font-size: 14px;
+        }
+        .button-section {
+            margin: 15px 0;
+        }
+        #runQuery {
+            background-color: #007cba;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-right: 10px;
+        }
+        #runQuery:hover {
+            background-color: #005a87;
+        }
+        #runQuery:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+        #clearQuery {
+            background-color: #6c757d;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        #clearQuery:hover {
+            background-color: #5a6268;
+        }
+        .results-section {
+            margin-top: 20px;
+        }
+        #results {
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 15px;
+            background-color: #f8f9fa;
+            min-height: 100px;
+            max-height: 500px;
+            overflow: auto;
+            white-space: pre-wrap;
+            font-family: 'Courier New', monospace;
+        }
+        .loading {
+            color: #007cba;
+            font-style: italic;
+        }
+        .error {
+            color: #dc3545;
+        }
+        .success {
+            color: #28a745;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+            font-weight: bold;
+        }
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>SQL Query Runner</h1>
+        
+        <div class="query-section">
+            <label for="sqlQuery">SQL Query:</label>
+            <textarea id="sqlQuery" name="sqlQuery" placeholder="Enter your SQL query here...">-- Example queries:
+-- SELECT 1 as test;
+-- SHOW TABLES;
+-- SHOW DATABASES;
+
+SELECT 1 as test;</textarea>
+        </div>
+        
+        <div class="button-section">
+            <button id="runQuery">Run Query</button>
+            <button id="clearQuery">Clear</button>
+        </div>
+        
+        <div class="results-section">
+            <h3>Results:</h3>
+            <div id="results">Ready to execute SQL queries...</div>
+        </div>
+    </div>
+
+    <!-- CodeMirror JavaScript -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/sql/sql.min.js"></script>
+    
+    <script>
+        // Initialize CodeMirror
+        const editor = CodeMirror.fromTextArea(document.getElementById('sqlQuery'), {
+            mode: 'text/x-sql',
+            theme: 'default',
+            lineNumbers: true,
+            indentWithTabs: true,
+            smartIndent: true,
+            lineWrapping: true,
+            autofocus: true,
+            extraKeys: {
+                "Ctrl-Enter": function() {
+                    runQuery();
+                },
+                "Ctrl-Space": "autocomplete"
+            }
+        });
+
+        // Function to clean SQL by removing comments and empty lines
+        function cleanSQL(sql) {
+            return sql
+                .split('\n')
+                .map(line => line.trim())
+                .filter(line => line && !line.startsWith('--'))
+                .join('\n')
+                .trim();
+        }
+
+        // Function to run SQL query
+        async function runQuery() {
+            const rawQuery = editor.getValue().trim();
+            const query = cleanSQL(rawQuery);
+            const resultsDiv = document.getElementById('results');
+            const runButton = document.getElementById('runQuery');
+            
+            if (!query) {
+                resultsDiv.innerHTML = '<span class="error">Please enter a SQL query.</span>';
+                return;
+            }
+            
+            // Disable button and show loading
+            runButton.disabled = true;
+            resultsDiv.innerHTML = '<span class="loading">Executing query...</span>';
+            
+            try {
+                const response = await fetch('/api/sqlexec.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        sql: query,
+                        params: []
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    displayResults(data);
+                } else {
+                    resultsDiv.innerHTML = `<span class="error">Error: ${response.status} - ${JSON.stringify(data)}</span>`;
+                }
+            } catch (error) {
+                resultsDiv.innerHTML = `<span class="error">Network error: ${error.message}</span>`;
+            } finally {
+                runButton.disabled = false;
+            }
+        }
+        
+        // Function to display results in a nice format
+        function displayResults(data) {
+            const resultsDiv = document.getElementById('results');
+            
+            if (data.error) {
+                resultsDiv.innerHTML = `<span class="error">Database Error: ${data.error}</span>`;
+                return;
+            }
+            
+            if (data.catch) {
+                resultsDiv.innerHTML = `<span class="error">Exception: ${data.catch}</span>`;
+                return;
+            }
+            
+            // Show successful execution
+            let html = '<span class="success">Query executed successfully!</span>\n';
+            html += `<strong>Executed SQL:</strong> ${data.sql}\n\n`;
+            
+            // Show results if available (for SELECT queries)
+            if (data.results && Array.isArray(data.results) && data.results.length > 0) {
+                html += '<table>';
+                
+                // Table headers
+                const firstRow = data.results[0];
+                html += '<tr>';
+                for (const key in firstRow) {
+                    html += `<th>${key}</th>`;
+                }
+                html += '</tr>';
+                
+                // Table rows
+                data.results.forEach(row => {
+                    html += '<tr>';
+                    for (const key in firstRow) {
+                        const value = row[key];
+                        html += `<td>${value !== null && value !== undefined ? value : 'NULL'}</td>`;
+                    }
+                    html += '</tr>';
+                });
+                
+                html += '</table>';
+                html += `\n\nReturned ${data.results.length} row(s).`;
+            }
+            // Show changes if available (for INSERT/UPDATE/DELETE)
+            else if (data.changes !== undefined && data.changes !== null) {
+                html += `<strong>Changes:</strong> ${data.changes} row(s) affected\n`;
+            }
+            
+            // Show last insert ID if available
+            if (data.lastInsertId && data.lastInsertId !== '0' && data.lastInsertId !== null) {
+                html += `<strong>Last Insert ID:</strong> ${data.lastInsertId}\n`;
+            }
+            
+            resultsDiv.innerHTML = html;
+        }
+        
+        // Function to clear query
+        function clearQuery() {
+            editor.setValue('');
+            document.getElementById('results').innerHTML = 'Ready to execute SQL queries...';
+            editor.focus();
+        }
+        
+        // Event listeners
+        document.getElementById('runQuery').addEventListener('click', runQuery);
+        document.getElementById('clearQuery').addEventListener('click', clearQuery);
+        
+        // Keyboard shortcut info
+        console.log('Keyboard shortcuts:');
+        console.log('Ctrl+Enter: Run query');
+        console.log('Ctrl+Space: Autocomplete (if available)');
+    </script>
+</body>
+</html>

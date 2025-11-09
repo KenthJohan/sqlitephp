@@ -1,8 +1,8 @@
 <?php
 
-require_once '../misc/db.php';
-require_once '../misc/schema.php';
-require_once '../misc/sql.php';
+require_once '../../misc/db.php';
+require_once '../../misc/schema.php';
+require_once '../../misc/sql.php';
 
 $db = db_new();
 
@@ -29,7 +29,7 @@ $sql = sql_generate_select($filters);
 // Prepare parameters for the query
 $params = $filters;
 $params["table"] = $table;
-$params["limit"] = 100;
+$params["limit"] = 1000;
 $statement = $db->select($sql, $params);
 
 

@@ -104,7 +104,7 @@ class SQLiteViewer {
                 }
             }
             
-            const response = await fetch(`query.php?${params}`);
+            const response = await fetch(`api/query.php?${params}`);
             if (!response.ok) {
                 throw new Error(`HTTP ${response.status}: ${response.statusText}`);
             }
@@ -345,7 +345,7 @@ class SQLiteViewer {
         this.hideError();
         
         try {
-            const response = await fetch('update.php', {
+            const response = await fetch('api/update.php', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
