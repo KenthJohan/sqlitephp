@@ -6,36 +6,38 @@ CREATE TABLE IF NOT EXISTS `peripherals` (
   `baseAddress` INTEGER NOT NULL,
   `offset` INTEGER,
   `size` INTEGER,
+  `derivedFrom` TEXT,
   `created_at` DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 
-INSERT INTO `peripherals` (`name`, `description`, `baseAddress`, `offset`, `size`) VALUES ('ADC', 'ADC address block description', 1073816576, 0, 780);
-INSERT INTO `peripherals` (`name`, `description`, `baseAddress`, `offset`, `size`) VALUES ('CRC', 'CRC address block description', 1073885184, 0, 24);
-INSERT INTO `peripherals` (`name`, `description`, `baseAddress`, `offset`, `size`) VALUES ('DBG', 'DBG address block description', 1073829888, 0, 16);
-INSERT INTO `peripherals` (`name`, `description`, `baseAddress`, `offset`, `size`) VALUES ('DMA', 'DMA register bank', 1073872896, 0, 1024);
-INSERT INTO `peripherals` (`name`, `description`, `baseAddress`, `offset`, `size`) VALUES ('DMAMUX', 'DMAMUX address block description', 1073874944, 0, 328);
-INSERT INTO `peripherals` (`name`, `description`, `baseAddress`, `offset`, `size`) VALUES ('EXTI', 'EXTI address block description', 1073879040, 0, 152);
-INSERT INTO `peripherals` (`name`, `description`, `baseAddress`, `offset`, `size`) VALUES ('FLASH', 'FLASH register block', 1073881088, 0, 1024);
-INSERT INTO `peripherals` (`name`, `description`, `baseAddress`, `offset`, `size`) VALUES ('GPIOA', 'GPIOA address block description', 1342177280, 0, 44);
-INSERT INTO `peripherals` (`name`, `description`, `baseAddress`, `offset`, `size`) VALUES ('GPIOB', 'GPIOB address block description', 1342178304, 0, 44);
-INSERT INTO `peripherals` (`name`, `description`, `baseAddress`, `offset`, `size`) VALUES ('GPIOC', 'GPIOC address block description', 1342179328, 0, 44);
-INSERT INTO `peripherals` (`name`, `description`, `baseAddress`, `offset`, `size`) VALUES ('GPIOD', 'GPIOD address block description', 1342180352, 0, 44);
-INSERT INTO `peripherals` (`name`, `description`, `baseAddress`, `offset`, `size`) VALUES ('GPIOF', 'GPIOF address block description', 1342182400, 0, 44);
-INSERT INTO `peripherals` (`name`, `description`, `baseAddress`, `offset`, `size`) VALUES ('IWDG', 'IWDG address block description', 1073754112, 0, 20);
-INSERT INTO `peripherals` (`name`, `description`, `baseAddress`, `offset`, `size`) VALUES ('I2C1', 'I2C address block description', 1073763328, 0, 44);
-INSERT INTO `peripherals` (`name`, `description`, `baseAddress`, `offset`, `size`) VALUES ('I2C2', 'No description available', 1073764352, 0, 0);
-INSERT INTO `peripherals` (`name`, `description`, `baseAddress`, `offset`, `size`) VALUES ('PWR', 'PWR address block description', 1073770496, 0, 128);
-INSERT INTO `peripherals` (`name`, `description`, `baseAddress`, `offset`, `size`) VALUES ('RCC', 'RCC address block description', 1073876992, 0, 100);
-INSERT INTO `peripherals` (`name`, `description`, `baseAddress`, `offset`, `size`) VALUES ('RTC', 'RTC address block description', 1073752064, 0, 96);
-INSERT INTO `peripherals` (`name`, `description`, `baseAddress`, `offset`, `size`) VALUES ('SPI1', 'SPI address block description', 1073819648, 0, 34);
-INSERT INTO `peripherals` (`name`, `description`, `baseAddress`, `offset`, `size`) VALUES ('SPI2', 'No description available', 1073756160, 0, 0);
-INSERT INTO `peripherals` (`name`, `description`, `baseAddress`, `offset`, `size`) VALUES ('SYSCFG', 'Spider_SYSCFG register block', 1073807360, 0, 1024);
-INSERT INTO `peripherals` (`name`, `description`, `baseAddress`, `offset`, `size`) VALUES ('TIM1', 'TIM1 address block description', 1073818624, 0, 108);
-INSERT INTO `peripherals` (`name`, `description`, `baseAddress`, `offset`, `size`) VALUES ('TIM2', 'TIM2 address block description', 1073741824, 0, 108);
-INSERT INTO `peripherals` (`name`, `description`, `baseAddress`, `offset`, `size`) VALUES ('TIM3', 'TIM3 address block description', 1073742848, 0, 108);
-INSERT INTO `peripherals` (`name`, `description`, `baseAddress`, `offset`, `size`) VALUES ('TIM14', 'TIM14 address block description', 1073750016, 0, 108);
-INSERT INTO `peripherals` (`name`, `description`, `baseAddress`, `offset`, `size`) VALUES ('TIM16', 'TIM16 address block description', 1073824768, 0, 108);
-INSERT INTO `peripherals` (`name`, `description`, `baseAddress`, `offset`, `size`) VALUES ('TIM17', 'TIM17 address block description', 1073825792, 0, 108);
-INSERT INTO `peripherals` (`name`, `description`, `baseAddress`, `offset`, `size`) VALUES ('USART1', 'USART address block description', 1073821696, 0, 48);
-INSERT INTO `peripherals` (`name`, `description`, `baseAddress`, `offset`, `size`) VALUES ('USART2', 'No description available', 1073759232, 0, 0);
-INSERT INTO `peripherals` (`name`, `description`, `baseAddress`, `offset`, `size`) VALUES ('WWDG', 'WWDG address block description', 1073753088, 0, 12);
+INSERT INTO `peripherals` (`name`, `description`, `address`, `offset`, `size`) VALUES
+  ('ADC', 'ADC address block description', 0x40012400, 0x0, 0x30C),
+  ('CRC', 'CRC address block description', 0x40023000, 0x0, 0x18),
+  ('DBG', 'DBG address block description', 0x40015800, 0x0, 0x10),
+  ('DMA', 'DMA register bank', 0x40020000, 0x0, 0x400),
+  ('DMAMUX', 'DMAMUX address block description', 0x40020800, 0x0, 0x148),
+  ('EXTI', 'EXTI address block description', 0x40021800, 0x0, 0x98),
+  ('FLASH', 'FLASH register block', 0x40022000, 0x0, 0x400),
+  ('GPIOA', 'GPIOA address block description', 0x50000000, 0x0, 0x2C),
+  ('GPIOB', 'GPIOB address block description', 0x50000400, 0x0, 0x2C),
+  ('GPIOC', 'GPIOC address block description', 0x50000800, 0x0, 0x2C),
+  ('GPIOD', 'GPIOD address block description', 0x50000C00, 0x0, 0x2C),
+  ('GPIOF', 'GPIOF address block description', 0x50001400, 0x0, 0x2C),
+  ('IWDG', 'IWDG address block description', 0x40003000, 0x0, 0x14),
+  ('I2C1', 'I2C address block description', 0x40005400, 0x0, 0x2C),
+  ('I2C2', 'I2C address block description', 0x40005800, 0x0, 0x2C),
+  ('PWR', 'PWR address block description', 0x40007000, 0x0, 0x80),
+  ('RCC', 'RCC address block description', 0x40021000, 0x0, 0x64),
+  ('RTC', 'RTC address block description', 0x40002800, 0x0, 0x60),
+  ('SPI1', 'SPI address block description', 0x40013000, 0x0, 0x22),
+  ('SPI2', 'SPI address block description', 0x40003800, 0x0, 0x22),
+  ('SYSCFG', 'Spider_SYSCFG register block', 0x40010000, 0x0, 0x400),
+  ('TIM1', 'TIM1 address block description', 0x40012C00, 0x0, 0x6C),
+  ('TIM2', 'TIM2 address block description', 0x40000000, 0x0, 0x6C),
+  ('TIM3', 'TIM3 address block description', 0x40000400, 0x0, 0x6C),
+  ('TIM14', 'TIM14 address block description', 0x40002000, 0x0, 0x6C),
+  ('TIM16', 'TIM16 address block description', 0x40014400, 0x0, 0x6C),
+  ('TIM17', 'TIM17 address block description', 0x40014800, 0x0, 0x6C),
+  ('USART1', 'USART address block description', 0x40013800, 0x0, 0x30),
+  ('USART2', 'USART address block description', 0x40004400, 0x0, 0x30),
+  ('WWDG', 'WWDG address block description', 0x40002C00, 0x0, 0xC);

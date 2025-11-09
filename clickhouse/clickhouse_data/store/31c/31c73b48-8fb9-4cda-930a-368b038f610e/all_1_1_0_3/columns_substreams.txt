@@ -1,0 +1,13 @@
+columns substreams version: 1
+5 columns:
+1 substreams for column `name`:
+	name
+1 substreams for column `description`:
+	description
+1 substreams for column `address`:
+	address
+2 substreams for column `offset`:
+	offset.sparse.idx
+	offset
+1 substreams for column `size`:
+	size

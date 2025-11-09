@@ -74,6 +74,8 @@ class SQLiteViewer {
     
     loadTable() {
         const tableName = this.tableInput.value.trim();
+        console.log('Loading table:', tableName);
+
         if (!tableName) {
             this.showError('Please enter a table name');
             return;
@@ -112,9 +114,9 @@ class SQLiteViewer {
             if (data.error) {
                 throw new Error(data.error);
             }
-            
-            this.schema = data.schema;
-            this.renderTable(data.schema, data.rows);
+
+            this.columns = data.columns;
+            this.renderTable(data.columns, data.rows);
             this.updateActiveFilters();
             
         } catch (error) {
@@ -148,14 +150,14 @@ class SQLiteViewer {
         return { type: 'text' };
     }
 
-    renderTable(schema, rows) {
+    renderTable(columns, rows) {
         this.tableTitle.textContent = `Table: ${this.currentTable}`;
         
         // Create header with filter inputs
         this.tableHeader.innerHTML = '';
         const headerRow = document.createElement('tr');
         
-        schema.forEach(column => {
+        columns.forEach(column => {
             const th = document.createElement('th');
             const inputConfig = this.getInputTypeForColumn(column.type || 'TEXT');
             
@@ -200,7 +202,7 @@ class SQLiteViewer {
         const modifyRow = document.createElement('tr');
         modifyRow.className = 'modify-row';
         
-        schema.forEach((column, index) => {
+        columns.forEach((column, index) => {
             const th = document.createElement('th');
             const inputConfig = this.getInputTypeForColumn(column.type || 'TEXT');
             
@@ -225,7 +227,7 @@ class SQLiteViewer {
             }
             
             // For the last column, add the update button alongside the input
-            if (index === schema.length - 1) {
+            if (index === columns.length - 1) {
                 th.innerHTML = `
                     <div class="modify-header">
                         <small>Update ${column.name}:</small>
@@ -278,7 +280,7 @@ class SQLiteViewer {
         this.tableBody.innerHTML = '';
         rows.forEach(row => {
             const tr = document.createElement('tr');
-            schema.forEach((column, columnIndex) => {
+            columns.forEach((column, columnIndex) => {
                 const td = document.createElement('td');
                 const cellValue = row[column.name] || '';
                 td.textContent = cellValue;
@@ -313,28 +315,29 @@ class SQLiteViewer {
     
     async applyUpdates() {
         const updateInputs = this.tableHeader.querySelectorAll('.update-input');
-        const updates = {};
+        const params = {};
+        params.table = this.currentTable;
         
         // Collect non-empty update values
         updateInputs.forEach(input => {
             const value = input.value.trim();
             if (value) {
-                updates[input.dataset.column] = value;
+                params["u_" + input.dataset.column] = value;
+            }
+        });
+
+        Object.entries(this.currentFilters).forEach(([column, value]) => {
+            if (value) {
+                params["f_" + column] = value;
             }
         });
         
-        if (Object.keys(updates).length === 0) {
+        if (Object.keys(params).length === 0) {
             this.showError('Please enter at least one value to update');
             return;
         }
-        
-        // Confirm the update operation
-        const filterCount = Object.keys(this.currentFilters).length;
-        const confirmMessage = filterCount > 0 
-            ? `Are you sure you want to update all filtered rows matching: ${Object.entries(this.currentFilters).map(([k,v]) => `${k}=${v}`).join(', ')}?`
-            : 'Are you sure you want to update ALL rows in this table?';
-            
-        if (!confirm(confirmMessage)) {
+
+        if (!confirm("Are you sure you want to update")) {
             return;
         }
         
@@ -347,11 +350,7 @@ class SQLiteViewer {
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({
-                    table: this.currentTable,
-                    updates: updates,
-                    filters: this.currentFilters
-                })
+                body: JSON.stringify(params),
             });
             
             if (!response.ok) {

@@ -1,7 +1,9 @@
 <?php
 
-include 'sqlmisc.php';
-$config = include 'config.php';
+require_once 'db.php';
+require_once 'schema.php';
+require_once 'sql.php';
+
 
 // Set JSON response header
 header('Content-Type: application/json');
@@ -21,84 +23,37 @@ if (!$input) {
     exit;
 }
 
-$tableName = $input['table'] ?? '';
-$updates = $input['updates'] ?? [];
-$filters = $input['filters'] ?? [];
+$params = $input;
 
-if (empty($tableName)) {
+
+if (empty($params)) {
+    http_response_code(400);
+    echo json_encode(['error' => 'No updates specified']);
+    exit;
+}
+
+if (empty($params['table'])) {
     http_response_code(400);
     echo json_encode(['error' => 'Table name is required']);
     exit;
 }
 
 // Prevent updates to SQLite system tables
-if (strtolower($tableName) === 'sqlite_master' || strtolower($tableName) === 'sqlite_sequence') {
+if (strtolower($params['table']) === 'sqlite_master' || strtolower($params['table']) === 'sqlite_sequence') {
     http_response_code(403);
     echo json_encode(['error' => 'Updates to SQLite system tables are not allowed']);
     exit;
 }
 
-if (empty($updates)) {
-    http_response_code(400);
-    echo json_encode(['error' => 'No updates specified']);
-    exit;
-}
 
-try {
-    // Connect to SQLite database using PDO
-    $pdo = new PDO("sqlite:{$config['database']}");
-    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-    
-    // Get table schema to validate columns
-    $schema = getTableSchema($pdo, $tableName);
-    $validColumns = array_column($schema, 'name');
-    
-    // Validate update columns
-    foreach ($updates as $column => $value) {
-        if (!in_array($column, $validColumns)) {
-            throw new Exception("Invalid column: $column");
-        }
-    }
-    
-    // Build UPDATE SQL
-    $setParts = [];
-    $params = [];
-    
-    foreach ($updates as $column => $value) {
-        $setParts[] = "`$column` = ?";
-        $params[] = $value;
-    }
-    
-    $sql = "UPDATE `$tableName` SET " . implode(', ', $setParts);
-    
-    // Add WHERE clause based on filters
-    $whereParts = [];
-    foreach ($filters as $column => $value) {
-        if (!in_array($column, $validColumns)) {
-            throw new Exception("Invalid filter column: $column");
-        }
-        $whereParts[] = "`$column` LIKE ?";
-        $params[] = "%$value%";
-    }
-    
-    if (!empty($whereParts)) {
-        $sql .= " WHERE " . implode(' AND ', $whereParts);
-    }
-    
-    // Execute the update
-    $stmt = $pdo->prepare($sql);
-    $stmt->execute($params);
-    
-    $affectedRows = $stmt->rowCount();
-    
-    echo json_encode([
-        'success' => true,
-        'affected_rows' => $affectedRows,
-        'sql' => $sql,
-        'message' => "Updated $affectedRows rows"
-    ]);
-    
-} catch (Exception $e) {
-    http_response_code(500);
-    echo json_encode(['error' => $e->getMessage()]);
-}
+
+
+$db = db_new();
+$columns = schema_columns($db, $params['table']);
+sql_validate_column($params, $columns);
+$sql = sql_generate_update($params);
+$db->write($sql, $params);
+
+echo json_encode([
+    'sql' => $sql,
+]);

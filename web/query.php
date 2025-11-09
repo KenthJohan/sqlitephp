@@ -1,51 +1,43 @@
 <?php
 
-include 'sqlmisc.php';
-$config = include 'config.php';
+require_once 'db.php';
+require_once 'schema.php';
+require_once 'sql.php';
+
+$db = db_new();
 
 
-
-try {
-    // Connect to SQLite database using PDO
-    $pdo = new PDO("sqlite:{$config['database']}");
-    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-} catch (PDOException $e) {
-    die("Database connection failed: " . $e->getMessage());
-}
-
-$tableName = $_GET['table'] ?? '';
-if (empty($tableName)) {
+$table = $_GET['table'] ?? '';
+if (empty($table)) {
     http_response_code(400);
     echo json_encode(['error' => 'Table name is required']);
     exit;
 }
 
-// Parse filters from URL parameters (prefixed with "f_")
+// Add all parameters (prefixed with "f_") for filtering
 $filters = [];
 foreach ($_GET as $key => $value) {
     if (str_starts_with($key, 'f_') && !empty($value)) {
-        $columnName = substr($key, 2); // Remove "f_" prefix
-        $filters[$columnName] = $value;
+        $filters[$key] = $value;
     }
 }
 
-try {
-    $schema = getTableSchema($pdo, $tableName);
-    $result = generateSQL($pdo, $tableName, 100, $filters);
-    
-    $stmt = $pdo->prepare($result['sql']);
-    $stmt->execute($result['params']);
-    $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+$columns = schema_columns($db, $table);
 
-    header('Content-Type: application/json');
-    echo json_encode([
-        'schema' => $schema,
-        'rows' => $rows,
-        'filters' => $filters,
-        'sql' => $result['sql'],
-        'params' => $result['params']
-    ]);
-} catch (Exception $e) {
-    http_response_code(500);
-    echo json_encode(['error' => $e->getMessage()]);
-}
+$sql = sql_generate_select($filters);
+
+// Prepare parameters for the query
+$params = $filters;
+$params["table"] = $table;
+$params["limit"] = 100;
+$statement = $db->select($sql, $params);
+
+
+header('Content-Type: application/json');
+echo json_encode([
+    'columns' => $columns,
+    'rows' => $statement->rows(),
+    'filters' => $filters,
+    'params' => $params,
+    'sql' => $sql,
+]);
