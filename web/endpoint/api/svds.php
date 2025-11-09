@@ -1,15 +1,6 @@
 <?php
 
-function getDirContents($path) {
-    $rii = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($path));
-
-    $files = array(); 
-    foreach ($rii as $file)
-        if (!$file->isDir())
-            $files[] = $file->getPathname();
-
-    return $files;
-}
+include_once '../../misc/fs.php';
 
 header('Content-Type: text/plain');
-var_dump(getDirContents("../../svd"));
+var_dump(fs_find_files_with_ext("../../../svd", "svd"));
