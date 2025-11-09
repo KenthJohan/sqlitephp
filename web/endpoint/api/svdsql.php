@@ -23,11 +23,11 @@ function generate_sql_from_one_svd($svdFile, $mcu_name = null) {
     $sqlStatements = $parser->generateSQLInserts($peripherals, 'peripherals', $mcu_name);
     
     // Output the SQL
-    echo $sqlStatements;
+    //echo $sqlStatements;
     
     // Optionally write to file
-    //$outputFile = __DIR__ . '/peripherals_inserts_' . basename($svdFile, '.svd') . '.sql';
-    //file_put_contents($outputFile, $sqlStatements);
+    $outputFile = __DIR__ . '/sqlinserts/peripherals_' . $mcu_name . '.sql';
+    file_put_contents($outputFile, $sqlStatements);
     //echo "\nSQL statements saved to: {$outputFile}\n";
 }
 

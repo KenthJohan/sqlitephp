@@ -1,0 +1,40 @@
+-- Create table for peripherals
+CREATE TABLE IF NOT EXISTS `peripherals` (
+  `id` INTEGER PRIMARY KEY AUTOINCREMENT,
+  `name` TEXT NOT NULL,
+  `description` TEXT,
+  `baseAddress` INTEGER NOT NULL,
+  `offset` INTEGER,
+  `size` INTEGER,
+  `derivedFrom` TEXT,
+  `created_at` DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+
+INSERT INTO `peripherals` (`name`, `description`, `address`, `offset`, `size`, `mcu_name`) VALUES
+  ('ADC', 'No description available', 0x41006000, 0x0, 0x68, 'STM32WB05'),
+  ('CRC', 'CRC address block description', 0x48200000, 0x0, 0x400, 'STM32WB05'),
+  ('DMA', 'No description available', 0x48700000, 0x0, 0xA4, 'STM32WB05'),
+  ('DMAMUX', 'No description available', 0x48800000, 0x0, 0x20, 'STM32WB05'),
+  ('GPIOA', 'No description available', 0x48000000, 0x0, 0x2C, 'STM32WB05'),
+  ('GPIOB', 'No description available', 0x48100000, 0x0, 0x2C, 'STM32WB05'),
+  ('IWDG', 'No description available', 0x40003000, 0x0, 0x14, 'STM32WB05'),
+  ('LPUART', 'No description available', 0x41005000, 0x0, 0x30, 'STM32WB05'),
+  ('FLASH_CTRL', '4kb addressable space', 0x40001000, 0x0, 0x200, 'STM32WB05'),
+  ('PKA', 'No description available', 0x48300000, 0x0, 0x1400, 'STM32WB05'),
+  ('PWRC', 'No description available', 0x48500000, 0x0, 0xA0, 'STM32WB05'),
+  ('RNG', 'No description available', 0x48600000, 0x0, 0x1000, 'STM32WB05'),
+  ('RTC', 'No description available', 0x40004000, 0x0, 0x58, 'STM32WB05'),
+  ('SYSTEM_CTRL', 'No description available', 0x40000000, 0x0, 0x40, 'STM32WB05'),
+  ('I2C1', 'I2C address block description', 0x41000000, 0x0, 0x400, 'STM32WB05'),
+  ('RCC', 'No description available', 0x48400000, 0x0, 0xA0, 'STM32WB05'),
+  ('SPI3', 'SPI address block description', 0x41007000, 0x0, 0x400, 'STM32WB05'),
+  ('TIM2', 'No description available', 0x40002000, 0x0, 0x6C, 'STM32WB05'),
+  ('TIM16', 'No description available', 0x40005000, 0x0, 0x6C, 'STM32WB05'),
+  ('TIM17', 'No description available', 0x40006000, 0x0, 0x64, 'STM32WB05'),
+  ('USART', 'No description available', 0x41004000, 0x0, 0x30, 'STM32WB05'),
+  ('BLUE_REG', 'No description available', 0x60000000, 0x0, 0x1000, 'STM32WB05'),
+  ('GLOBALSTATMACH_REG', 'No description available', 0x200000C0, 0x0, 0x1C, 'STM32WB05'),
+  ('RADIO_CONTROL_REG', 'No description available', 0x60001000, 0x0, 0x400, 'STM32WB05'),
+  ('RADIO_REG_REG', 'No description available', 0x60001500, 0x0, 0x300, 'STM32WB05'),
+  ('RRM_REG', 'No description available', 0x60001400, 0x0, 0x100, 'STM32WB05'),
+  ('WAKEUP_REG', 'No description available', 0x60001800, 0x0, 0x400, 'STM32WB05');

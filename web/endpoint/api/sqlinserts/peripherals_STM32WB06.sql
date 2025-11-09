@@ -1,0 +1,41 @@
+-- Create table for peripherals
+CREATE TABLE IF NOT EXISTS `peripherals` (
+  `id` INTEGER PRIMARY KEY AUTOINCREMENT,
+  `name` TEXT NOT NULL,
+  `description` TEXT,
+  `baseAddress` INTEGER NOT NULL,
+  `offset` INTEGER,
+  `size` INTEGER,
+  `derivedFrom` TEXT,
+  `created_at` DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+
+INSERT INTO `peripherals` (`name`, `description`, `address`, `offset`, `size`, `mcu_name`) VALUES
+  ('ADC', 'ADC address block description', 0x41006000, 0x0, 0x400, 'STM32WB06'),
+  ('CRC', 'CRC address block description', 0x48200000, 0x0, 0x400, 'STM32WB06'),
+  ('DMA', 'No description available', 0x48700000, 0x0, 0xA4, 'STM32WB06'),
+  ('DMAMUX', 'No description available', 0x48800000, 0x0, 0x20, 'STM32WB06'),
+  ('GPIOA', 'GPIOA address block description', 0x48000000, 0x0, 0x400, 'STM32WB06'),
+  ('I2C1', 'I2C address block description', 0x41000000, 0x0, 0x400, 'STM32WB06'),
+  ('RCC', 'No description available', 0x48400000, 0x0, 0xA0, 'STM32WB06'),
+  ('SPI3', 'SPI address block description', 0x41007000, 0x0, 0x400, 'STM32WB06'),
+  ('USART', 'USART address block description', 0x41004000, 0x0, 0x400, 'STM32WB06'),
+  ('BLUE', 'No description available', 0x60000000, 0x0, 0x1000, 'STM32WB06'),
+  ('GLOBALSTATMACH', 'No description available', 0x200000C0, 0x0, 0x1C, 'STM32WB06'),
+  ('RADIO_CONTROL', 'No description available', 0x60001000, 0x0, 0x400, 'STM32WB06'),
+  ('RADIO', 'No description available', 0x60001500, 0x0, 0x300, 'STM32WB06'),
+  ('RRM', 'No description available', 0x60001400, 0x0, 0x100, 'STM32WB06'),
+  ('WAKEUP', 'No description available', 0x60001800, 0x0, 0x400, 'STM32WB06'),
+  ('FLASH_CTRL', '4kb addressable space', 0x40001000, 0x0, 0x2000, 'STM32WB06'),
+  ('RNG', 'No description available', 0x48600000, 0x0, 0x1000, 'STM32WB06'),
+  ('PWRC', 'No description available', 0x48500000, 0x0, 0xA0, 'STM32WB06'),
+  ('PKA', 'No description available', 0x48300000, 0x0, 0x1400, 'STM32WB06'),
+  ('GPIOB', 'No description available', 0x48100000, 0x0, 0x2C, 'STM32WB06'),
+  ('LPUART', 'No description available', 0x41005000, 0x0, 0x30, 'STM32WB06'),
+  ('SPI2', 'No description available', 0x41003000, 0x0, 0x24, 'STM32WB06'),
+  ('SPI1', 'No description available', 0x41002000, 0x0, 0x24, 'STM32WB06'),
+  ('I2C2', 'No description available', 0x41001000, 0x0, 0x2C, 'STM32WB06'),
+  ('RTC', 'No description available', 0x40004000, 0x0, 0x58, 'STM32WB06'),
+  ('IWDG', 'No description available', 0x40003000, 0x0, 0x14, 'STM32WB06'),
+  ('TIM1', 'No description available', 0x40002000, 0x0, 0x68, 'STM32WB06'),
+  ('SYSTEM_CTRL', 'No description available', 0x40000000, 0x0, 0x40, 'STM32WB06');

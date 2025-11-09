@@ -1,0 +1,83 @@
+-- Create table for peripherals
+CREATE TABLE IF NOT EXISTS `peripherals` (
+  `id` INTEGER PRIMARY KEY AUTOINCREMENT,
+  `name` TEXT NOT NULL,
+  `description` TEXT,
+  `baseAddress` INTEGER NOT NULL,
+  `offset` INTEGER,
+  `size` INTEGER,
+  `derivedFrom` TEXT,
+  `created_at` DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+
+INSERT INTO `peripherals` (`name`, `description`, `address`, `offset`, `size`, `mcu_name`) VALUES
+  ('PWR', 'Power control', 0x40007000, 0x0, 0x400, 'STM32F102'),
+  ('RCC', 'Reset and clock control', 0x40021000, 0x0, 0x400, 'STM32F102'),
+  ('GPIOA', 'General purpose I/O', 0x40010800, 0x0, 0x400, 'STM32F102'),
+  ('GPIOB', 'General purpose I/O', 0x40010C00, 0x0, 0x400, 'STM32F102'),
+  ('GPIOC', 'General purpose I/O', 0x40011000, 0x0, 0x400, 'STM32F102'),
+  ('GPIOD', 'General purpose I/O', 0x40011400, 0x0, 0x400, 'STM32F102'),
+  ('GPIOE', 'General purpose I/O', 0x40011800, 0x0, 0x400, 'STM32F102'),
+  ('GPIOF', 'General purpose I/O', 0x40011C00, 0x0, 0x400, 'STM32F102'),
+  ('GPIOG', 'General purpose I/O', 0x40012000, 0x0, 0x400, 'STM32F102'),
+  ('AFIO', 'Alternate function I/O', 0x40010000, 0x0, 0x400, 'STM32F102'),
+  ('EXTI', 'EXTI', 0x40010400, 0x0, 0x400, 'STM32F102'),
+  ('DMA1', 'DMA controller', 0x40020000, 0x0, 0x400, 'STM32F102'),
+  ('DMA2', 'DMA controller', 0x40020400, 0x0, 0x400, 'STM32F102'),
+  ('RTC', 'Real time clock', 0x40002800, 0x0, 0x400, 'STM32F102'),
+  ('IWDG', 'Independent watchdog', 0x40003000, 0x0, 0x400, 'STM32F102'),
+  ('WWDG', 'Window watchdog', 0x40002C00, 0x0, 0x400, 'STM32F102'),
+  ('TIM2', 'General purpose timer', 0x40000000, 0x0, 0x400, 'STM32F102'),
+  ('TIM3', 'General purpose timer', 0x40000400, 0x0, 0x400, 'STM32F102'),
+  ('I2C1', 'Inter integrated circuit', 0x40005400, 0x0, 0x400, 'STM32F102'),
+  ('I2C2', 'Inter integrated circuit', 0x40005800, 0x0, 0x400, 'STM32F102'),
+  ('SPI1', 'Serial peripheral interface', 0x40013000, 0x0, 0x400, 'STM32F102'),
+  ('USART1', 'Universal synchronous asynchronous receiver
+      transmitter', 0x40013800, 0x0, 0x400, 'STM32F102'),
+  ('USART2', 'Universal synchronous asynchronous receiver
+      transmitter', 0x40004400, 0x0, 0x400, 'STM32F102'),
+  ('ADC1', 'Analog to digital converter', 0x40012400, 0x0, 0x400, 'STM32F102'),
+  ('ADC3', 'Analog to digital converter', 0x40013C00, 0x0, 0x400, 'STM32F102'),
+  ('CRC', 'CRC calculation unit', 0x40023000, 0x0, 0x400, 'STM32F102'),
+  ('FLASH', 'FLASH', 0x40022000, 0x0, 0x400, 'STM32F102'),
+  ('DBG', 'Debug support', 0xE0042000, 0x0, 0x400, 'STM32F102'),
+  ('BKP', 'Backup registers', 0x40006C00, 0x0, 0x400, 'STM32F102'),
+  ('FSMC', 'Flexible static memory controller', 0xA0000000, 0x0, 0x1000, 'STM32F102'),
+  ('OTG_FS_DEVICE', 'USB on the go full speed', 0x50000800, 0x0, 0x400, 'STM32F102'),
+  ('OTG_FS_GLOBAL', 'USB on the go full speed', 0x50000000, 0x0, 0x400, 'STM32F102'),
+  ('OTG_FS_HOST', 'USB on the go full speed', 0x50000400, 0x0, 0x400, 'STM32F102'),
+  ('OTG_FS_PWRCLK', 'USB on the go full speed', 0x50000E00, 0x0, 0x400, 'STM32F102'),
+  ('SDIO', 'Secure digital input/output
+      interface', 0x40018000, 0x0, 0x400, 'STM32F102'),
+  ('TIM10', 'General purpose timer', 0x40015000, 0x0, 0x400, 'STM32F102'),
+  ('TIM11', 'General purpose timer', 0x40015400, 0x0, 0x400, 'STM32F102'),
+  ('TIM9', 'General purpose timer', 0x40014C00, 0x0, 0x400, 'STM32F102'),
+  ('TIM12', 'General purpose timer', 0x40001800, 0x0, 0x400, 'STM32F102'),
+  ('TIM8', 'Advanced timer', 0x40013400, 0x0, 0x400, 'STM32F102'),
+  ('TIM1', 'Advanced timer', 0x40012C00, 0x0, 0x400, 'STM32F102'),
+  ('ADC2', 'Analog to digital converter', 0x40012800, 0x0, 0x400, 'STM32F102'),
+  ('DAC', 'Digital to analog converter', 0x40007400, 0x0, 0x400, 'STM32F102'),
+  ('CAN1', 'Controller area network', 0x40006400, 0x0, 0x400, 'STM32F102'),
+  ('CAN2', 'Controller area network', 0x40006800, 0x0, 0x400, 'STM32F102'),
+  ('USB', 'Universal serial bus full-speed device
+      interface', 0x40005C00, 0x0, 0x400, 'STM32F102'),
+  ('UART5', 'Universal asynchronous receiver
+      transmitter', 0x40005000, 0x0, 0x400, 'STM32F102'),
+  ('UART4', 'Universal asynchronous receiver
+      transmitter', 0x40004C00, 0x0, 0x400, 'STM32F102'),
+  ('SPI2', 'Serial peripheral interface', 0x40003800, 0x0, 0x400, 'STM32F102'),
+  ('SPI3', 'Serial peripheral interface', 0x40003C00, 0x0, 0x400, 'STM32F102'),
+  ('TIM4', 'General purpose timer', 0x40000800, 0x0, 0x400, 'STM32F102'),
+  ('TIM5', 'General purpose timer', 0x40000C00, 0x0, 0x400, 'STM32F102'),
+  ('TIM6', 'Basic timer', 0x40001000, 0x0, 0x400, 'STM32F102'),
+  ('TIM7', 'Basic timer', 0x40001400, 0x0, 0x400, 'STM32F102'),
+  ('TIM13', 'General purpose timer', 0x40001C00, 0x0, 0x400, 'STM32F102'),
+  ('TIM14', 'General purpose timer', 0x40002000, 0x0, 0x400, 'STM32F102'),
+  ('NVIC', 'Nested Vectored Interrupt
+      Controller', 0xE000E100, 0x0, 0x33D, 'STM32F102'),
+  ('MPU', 'Memory protection unit', 0xE000ED90, 0x0, 0x15, 'STM32F102'),
+  ('SCB_ACTRL', 'System control block ACTLR', 0xE000E008, 0x0, 0x5, 'STM32F102'),
+  ('NVIC_STIR', 'Nested vectored interrupt
+      controller', 0xE000EF00, 0x0, 0x5, 'STM32F102'),
+  ('SCB', 'System control block', 0xE000ED00, 0x0, 0x41, 'STM32F102'),
+  ('STK', 'SysTick timer', 0xE000E010, 0x0, 0x11, 'STM32F102');
