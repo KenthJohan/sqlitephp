@@ -1,8 +1,8 @@
 <?php
 
-require_once 'db.php';
-require_once 'schema.php';
-require_once 'sql.php';
+require_once '../misc/db.php';
+require_once '../misc/schema.php';
+require_once '../misc/sql.php';
 
 
 // Set JSON response header
